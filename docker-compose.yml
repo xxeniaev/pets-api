@@ -10,8 +10,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 compose_django_project/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     ports:
