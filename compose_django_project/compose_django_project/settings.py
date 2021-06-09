@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # 'api.apps.ApiConfig'
     'api',
     "rest_framework",
-    # "rest_framework_api_key",
+    "rest_framework_api_key",
 ]
 
 MIDDLEWARE = [
@@ -131,3 +131,15 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MEDIA_ROOT = '/media/'
+
+# REST_FRAMEWORK = {
+#     "DEFAULT_PERMISSION_CLASSES": [
+#         "rest_framework_api_key.permissions.HasAPIKey",
+#     ]
+# }
+
+# API_KEY = 'dd3f075e-f2cb-43ce-9174-08b135f8e3ec'
+
+# API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
