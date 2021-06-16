@@ -10,6 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+# importing api key
+try:
+    from .local_settings import *
+except ImportError:
+    pass  # No local_settings file
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -132,14 +138,10 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# MEDIA_ROOT = '/media/'
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework_api_key.permissions.HasAPIKey",
+    ]
+}
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_PERMISSION_CLASSES": [
-#         "rest_framework_api_key.permissions.HasAPIKey",
-#     ]
-# }
-
-# API_KEY = 'dd3f075e-f2cb-43ce-9174-08b135f8e3ec'
-
-# API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
+X_API_KEY_HEADER = "HTTP_X_API_KEY"

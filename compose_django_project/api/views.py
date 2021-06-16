@@ -1,14 +1,17 @@
 from django.http import HttpResponse
-from django.shortcuts import render
-from rest_framework import viewsets, status
+import json
+from rest_framework import viewsets
+from rest_framework.decorators import action
+
+from .permissions import HasXAPIKey
 from .serializers import PetSerializer, PhotoSerializer
 from .models import PetModel, PhotoModel
 from rest_framework.response import Response
 
-# Create your views here.
-
 
 class PetViewSet(viewsets.ModelViewSet):
+    permission_classes = [HasXAPIKey]
+
     queryset = PetModel.objects.all().order_by('id')
     serializer_class = PetSerializer
 
@@ -22,14 +25,69 @@ class PetViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request):
-        qs = self.queryset
-        serializer = PetSerializer(qs, many=True)
-        return Response(serializer.data)
+        query_dict = request.GET
+
+        try:
+            limit = int(query_dict.get('limit'))
+        except TypeError:
+            limit = 20
+
+        try:
+            offset = int(query_dict.get('offset'))
+        except TypeError:
+            offset = 0
+
+        has_photos = query_dict.get('has_photos')
+        if has_photos:
+            if has_photos == u'true' or has_photos == u'True':
+                has_photos = True
+            else:
+                has_photos = False
+        else:
+            has_photos = None
+
+        # тут проверка на наличие фото
+        # работает, но плохо написано - переделать!
+        new_qs = []
+        if has_photos:
+            for pet_model in self.queryset:
+                if pet_model.photos.count() != 0:
+                    new_qs.append(pet_model)
+
+        if has_photos is False:
+            for pet_model in self.queryset:
+                if pet_model.photos.count() == 0:
+                    new_qs.append(pet_model)
+
+        if has_photos is None:
+            new_qs = self.queryset
+
+        serializer = PetSerializer(new_qs[offset:offset + limit], many=True)
+        serializer_data = list(serializer.data)
+        response_data = {'count': len(serializer_data), 'items': serializer_data}
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     # delete
-    def destroy(self, request, pk=None):
-        self.queryset.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    @action(methods=['delete'], detail=False)
+    def delete(self, request, pk=None):
+        response_data = {'deleted': 0, 'errors': []}
+
+        delete_ids = request.data['ids']
+
+        i = 0
+        for pet_id in delete_ids:
+            try:
+                pet = PetModel.objects.get(pk=pet_id)
+                photos = pet.photos.all()
+                for photo in photos:
+                    photo.delete()
+                pet.delete()
+                i += 1
+            except PetModel.DoesNotExist:
+                response_data['errors'].append({'id': pet_id, 'error': "Pet with the matching ID was not found."})
+
+        response_data['deleted'] = i
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
 class PhotoViewSet(viewsets.ModelViewSet):
@@ -41,6 +99,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
         pet_id = int(kwargs['id'])
         pet = PetModel.objects.get(pk=pet_id)
         photo_serializer = PhotoSerializer(data=request.data)
+        print(request.data)
         if photo_serializer.is_valid():
             obj = photo_serializer.save()
             pet.photos.add(obj.id)
