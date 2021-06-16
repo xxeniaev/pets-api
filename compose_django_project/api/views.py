@@ -12,7 +12,7 @@ from rest_framework.response import Response
 class PetViewSet(viewsets.ModelViewSet):
     permission_classes = [HasXAPIKey]
 
-    queryset = PetModel.objects.all().order_by('id')
+p    queryset = PetModel.objects
     serializer_class = PetSerializer
 
     # post
@@ -47,22 +47,19 @@ class PetViewSet(viewsets.ModelViewSet):
             has_photos = None
 
         # тут проверка на наличие фото
-        # работает, но плохо написано - переделать!
-        new_qs = []
+        qs = self.queryset
+
+        # если есть фото
         if has_photos:
-            for pet_model in self.queryset:
-                if pet_model.photos.count() != 0:
-                    new_qs.append(pet_model)
-
+            qs = qs.exclude(photos=None)[offset:offset + limit]
+        # если нет фото
         if has_photos is False:
-            for pet_model in self.queryset:
-                if pet_model.photos.count() == 0:
-                    new_qs.append(pet_model)
-
+            qs = qs.filter(photos=None)[offset:offset + limit]
+        # если не важно
         if has_photos is None:
-            new_qs = self.queryset
+            qs = qs.all().order_by('id')[offset:offset + limit]
 
-        serializer = PetSerializer(new_qs[offset:offset + limit], many=True)
+        serializer = PetSerializer(qs, many=True)
         serializer_data = list(serializer.data)
         response_data = {'count': len(serializer_data), 'items': serializer_data}
         return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -93,6 +90,8 @@ class PetViewSet(viewsets.ModelViewSet):
 class PhotoViewSet(viewsets.ModelViewSet):
     queryset = PhotoModel.objects.all()
     serializer_class = PhotoSerializer
+
+    permission_classes = [HasXAPIKey]
 
     # post
     def create(self, request, **kwargs):
