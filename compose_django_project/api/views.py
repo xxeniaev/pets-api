@@ -12,7 +12,7 @@ from rest_framework.response import Response
 class PetViewSet(viewsets.ModelViewSet):
     permission_classes = [HasXAPIKey]
 
-p    queryset = PetModel.objects
+    queryset = PetModel.objects
     serializer_class = PetSerializer
 
     # post

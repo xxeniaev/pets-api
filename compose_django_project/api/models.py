@@ -10,4 +10,5 @@ class PetModel(models.Model):
     age = models.IntegerField()
     type = models.CharField(max_length=15, blank=False)
     photos = models.ManyToManyField(PhotoModel, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    # добавить time когда почищу базу
+    created_at = models.DateField(auto_now_add=True)
