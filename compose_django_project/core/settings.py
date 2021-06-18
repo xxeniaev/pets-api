@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'api',
     "rest_framework",
     "rest_framework_api_key",
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'compose_django_project.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'compose_django_project.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
@@ -140,7 +141,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework_api_key.permissions.HasAPIKey",
-    ]
+    ],
+    'EXCEPTION_HANDLER': 'api.utils.exception_handler.custom_exception_handler'
 }
 
 X_API_KEY_HEADER = "HTTP_X_API_KEY"
