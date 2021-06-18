@@ -57,7 +57,7 @@ class PetViewSet(viewsets.ModelViewSet):
             qs = qs.filter(photos=None)[offset:offset + limit]
         # если не важно
         if has_photos is None:
-            qs = qs.all().order_by('id')[offset:offset + limit]
+            qs = qs.all()[offset:offset + limit]
 
         serializer = PetSerializer(qs, many=True)
         serializer_data = list(serializer.data)
@@ -104,6 +104,13 @@ class PhotoViewSet(viewsets.ModelViewSet):
             pet.photos.add(obj.id)
             return Response(photo_serializer.data)
         return Response(photo_serializer.errors)
+
+    def list(self, request, **kwargs):
+        pet_id = int(kwargs['id'])
+        pet = PetModel.objects.get(pk=pet_id)
+        photos = pet.photos.all()
+        serializer = PhotoSerializer(photos, many=True)
+        return Response(serializer.data)
 
 
 def render_image(request, *args, **kwargs):

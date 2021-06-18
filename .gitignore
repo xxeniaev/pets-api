@@ -1,4 +1,4 @@
 venv
 .idea
 data
-compose_django_project/compose_django_project/local_settings.py
+compose_django_project/core/local_settings.py
