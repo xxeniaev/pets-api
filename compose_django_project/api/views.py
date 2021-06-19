@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from .permissions import HasXAPIKey
-from .serializers import PetSerializer, PhotoSerializer
+from .serializers import PetSerializer, PhotoSerializer, PetNewSerializer
 from .models import PetModel, PhotoModel
 from rest_framework.response import Response
 
@@ -20,7 +20,8 @@ class PetViewSet(viewsets.ModelViewSet):
         serializer = PetSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            pet = PetModel.objects.get(pk=serializer.data['id'])
+            return Response(PetNewSerializer(pet).data)
         return Response(serializer.errors)
 
     # get
@@ -59,7 +60,7 @@ class PetViewSet(viewsets.ModelViewSet):
         if has_photos is None:
             qs = qs.all()[offset:offset + limit]
 
-        serializer = PetSerializer(qs, many=True)
+        serializer = PetNewSerializer(qs, many=True)
         serializer_data = list(serializer.data)
         response_data = {'count': len(serializer_data), 'items': serializer_data}
         return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -95,7 +96,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     # post
     def create(self, request, **kwargs):
-        pet_id = int(kwargs['id'])
+        pet_id = kwargs['id']
         pet = PetModel.objects.get(pk=pet_id)
         photo_serializer = PhotoSerializer(data=request.data)
         print(request.data)
@@ -106,7 +107,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
         return Response(photo_serializer.errors)
 
     def list(self, request, **kwargs):
-        pet_id = int(kwargs['id'])
+        pet_id = kwargs['id']
         pet = PetModel.objects.get(pk=pet_id)
         photos = pet.photos.all()
         serializer = PhotoSerializer(photos, many=True)

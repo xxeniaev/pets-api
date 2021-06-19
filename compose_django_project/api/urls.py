@@ -6,7 +6,7 @@ router = routers.DefaultRouter()
 # path to pets list
 router.register(r'pets', views.PetViewSet, basename="pets")
 # path to all photos
-router.register(r'pets/(?P<id>\d+)/photo', views.PhotoViewSet, basename="photos")
+router.register(r'pets/(?P<id>[\d\-\w]+)/photo', views.PhotoViewSet, basename="photos")
 
 urlpatterns = [
     path('', include(router.urls)),
