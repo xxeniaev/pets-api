@@ -7,31 +7,25 @@ from api.models import PetModel
 
 
 class Command(BaseCommand):
-    help = 'Closes the specified poll for voting'
+    help = 'Get list of pets filtered by having photos'
 
     def add_arguments(self, parser):
-        # Named (optional) arguments
+        # optional arguments
         parser.add_argument(
-            '--has-photos',
-            action='store_true',
-            help='True if pets with photos, False if not'
-        )
-        parser.add_argument(
-            '--no-photos',
-            action='store_true',
-            help='True if pets with photos, False if not'
+            '--has-photos', type=str, metavar='',
+            help='enter True/true if pets with photos, False/false if not'
         )
 
     def handle(self, *args, **options):
         qs = PetModel.objects
 
-        if options['has_photos'] or options['no_photos']:
-            if options['has_photos']:
+        if options['has_photos']:
+            if options['has_photos'] == "True" or options['has_photos'] == "true":
                 qs = qs.exclude(photos=None)
-            elif options['no_photos']:
+            elif options['has_photos'] == "False" or options['has_photos'] == "false":
                 qs = qs.filter(photos=None)
         else:
-            qs = qs.all().order_by('id')
+            qs = qs.all()
 
         serializer = PetSerializer(qs, many=True)
         serializer_data = list(serializer.data)

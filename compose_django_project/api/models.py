@@ -6,7 +6,7 @@ import uuid
 
 class PhotoModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    url = models.FileField(null=True)
+    url = models.FileField()
 
 
 class PetModel(models.Model):
@@ -19,7 +19,11 @@ class PetModel(models.Model):
 
     @property
     def age(self):
+        """
+        Get auto-calculated age based on birthday
+        :return: age
+        """
         now = datetime.today()
         birthday = datetime.strptime(self.birth_date.strftime('%Y-%m-%d'), '%Y-%m-%d')
         dif = (now - birthday).days
-        return int(dif/365)
+        return int(dif/365.2425)
