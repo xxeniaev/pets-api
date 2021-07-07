@@ -15,8 +15,15 @@ class PetViewSet(viewsets.ModelViewSet):
     queryset = PetModel.objects
     serializer_class = PetSerializer
 
-    # post
     def create(self, request):
+        """
+        Create pet instance
+
+        :param request: http request
+
+        :return: pet's info
+        :rtype: Response
+        """
         serializer = PetSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -24,8 +31,15 @@ class PetViewSet(viewsets.ModelViewSet):
             return Response(PetNewSerializer(pet).data)
         return Response(serializer.errors)
 
-    # get
     def list(self, request):
+        """
+        Get all pets with pagination filtered by having photos or not
+
+        :param request: http request
+
+        :return: pets
+        :rtype: HttpResponse
+        """
         query_dict = request.GET
 
         try:
@@ -47,16 +61,16 @@ class PetViewSet(viewsets.ModelViewSet):
         else:
             has_photos = None
 
-        # тут проверка на наличие фото
+        # check for photo existence
         qs = self.queryset
 
-        # если есть фото
+        # filter by having photos
         if has_photos:
             qs = qs.exclude(photos=None)[offset:offset + limit]
-        # если нет фото
+        # filter by not having photos
         if has_photos is False:
             qs = qs.filter(photos=None)[offset:offset + limit]
-        # если не важно
+        # no filter
         if has_photos is None:
             qs = qs.all()[offset:offset + limit]
 
@@ -65,9 +79,18 @@ class PetViewSet(viewsets.ModelViewSet):
         response_data = {'count': len(serializer_data), 'items': serializer_data}
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
-    # delete
     @action(methods=['delete'], detail=False)
     def delete(self, request, pk=None):
+        """
+        Delete pets and their photos by given list of ids
+        TODO: move deletion login to separated component
+
+        :param request: http request
+        :param pk: primary key for deletion, default None
+
+        :return: count of deleted pets and errors occurred
+        :rtype: HttpResponse
+        """
         response_data = {'deleted': 0, 'errors': []}
 
         delete_ids = request.data['ids']
@@ -94,8 +117,16 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     permission_classes = [HasXAPIKey]
 
-    # post
     def create(self, request, **kwargs):
+        """
+        Post photo to pet's photo list by id
+
+        :param request: http request
+        :param kwargs: gets pet's id from url
+
+        :return: posted photo info
+        :rtype: Response
+        """
         pet_id = kwargs['id']
         pet = PetModel.objects.get(pk=pet_id)
         photo_serializer = PhotoSerializer(data=request.data)
@@ -107,6 +138,15 @@ class PhotoViewSet(viewsets.ModelViewSet):
         return Response(photo_serializer.errors)
 
     def list(self, request, **kwargs):
+        """
+        Get all photos of pet by id
+
+        :param request: http request
+        :param kwargs: gets pet's id from url
+
+        :return: pet's photos
+        :rtype: Response
+        """
         pet_id = kwargs['id']
         pet = PetModel.objects.get(pk=pet_id)
         photos = pet.photos.all()
@@ -114,7 +154,16 @@ class PhotoViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-def render_image(request, *args, **kwargs):
+def render_image(request, **kwargs):
+    """
+    Render one of pet's photos
+
+    :param request: http request
+    :param kwargs: gets path to image from url
+
+    :return: http response
+    :rtype: HttpResponse
+    """
     path = kwargs['img_path']
     image_data = open(path, "rb").read()
     return HttpResponse(image_data, content_type="image/png")

@@ -12,11 +12,10 @@ class PhotoSerializer(serializers.HyperlinkedModelSerializer):
 
 class PetSerializer(serializers.HyperlinkedModelSerializer):
     photos = PhotoSerializer(read_only=True, many=True)
-    age = serializers.ReadOnlyField()
 
     class Meta:
         model = PetModel
-        fields = ('id', 'name', 'age', 'type', 'photos', 'created_at', 'birth_date')
+        fields = ('id', 'name', 'type', 'photos', 'created_at', 'birth_date')
 
 
 class PetNewSerializer(serializers.HyperlinkedModelSerializer):

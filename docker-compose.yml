@@ -2,7 +2,8 @@ version: "3.9"
 
 services:
   db:
-    image: postgres
+    image: postgres:latest
+    restart: always
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -10,10 +11,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     command: python3 compose_django_project/manage.py runserver 0.0.0.0:8000
+    environment:
+      DEBUG: 1
     volumes:
       - .:/code
     ports:
