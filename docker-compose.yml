@@ -10,6 +10,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   web:
+    env_file:
+      - web-variables.env
     build:
       context: .
       dockerfile: Dockerfile
