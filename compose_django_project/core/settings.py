@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
+    'compose_django_project.api',
     "rest_framework",
     "rest_framework_api_key",
 ]
