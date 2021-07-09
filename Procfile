@@ -1,3 +1,3 @@
 release: python3 compose_django_project/manage.py migrate
 
-worker: python3 compose_django_project/manage.py runserver
+web: gunicorn compose_django_project/core.wsgi --log-file -
