@@ -5,3 +5,4 @@ djangorestframework-api-key==2.*
 gunicorn
 django-heroku
 dj-database-url
+django-debug-toolbar
