@@ -2,8 +2,8 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from compose_django_project.api.serializers import PetSerializer
-from compose_django_project.api.models import PetModel
+from api.serializers import PetSerializer
+from api.models import PetModel
 
 
 class Command(BaseCommand):
