@@ -6,3 +6,4 @@ gunicorn
 django-heroku
 dj-database-url
 django-debug-toolbar
+whitenoise

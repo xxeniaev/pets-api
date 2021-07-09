@@ -41,7 +41,6 @@ DEBUG = int(os.getenv('DEBUG', 0))
 ALLOWED_HOSTS = ['.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +54,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,6 +63,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ADMINS = [
+    ('Xenia', 'xxeniaev@gmail.com'),
+]
+
+WHITENOISE_USE_FINDERS = True
+STATIC_ROOT = None
 
 ROOT_URLCONF = 'core.urls'
 
@@ -146,3 +153,5 @@ REST_FRAMEWORK = {
 }
 
 X_API_KEY_HEADER = "HTTP_X_API_KEY"
+
+django_heroku.settings(locals())
