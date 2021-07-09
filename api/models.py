@@ -6,7 +6,7 @@ import uuid
 
 class PhotoModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    url = models.FileField()
+    url = models.FileField(default=None)
 
 
 class PetModel(models.Model):
