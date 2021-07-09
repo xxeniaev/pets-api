@@ -1,3 +1,3 @@
-release: python3 compose_django_project/manage.py migrate
+release: python3 manage.py migrate
 
-web: gunicorn compose_django_project.core.wsgi.application --preload
+web: gunicorn core.wsgi.application --preload
